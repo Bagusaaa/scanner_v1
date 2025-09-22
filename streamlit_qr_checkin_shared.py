@@ -165,7 +165,7 @@ if "scan_result" in st.session_state:
         f"""
         <div style="
             position: fixed;
-            top: 64px;
+            top: 30px;
             left: 50%;
             transform: translate(-50%, 0%);
             background-color: {color};
