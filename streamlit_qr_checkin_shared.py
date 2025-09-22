@@ -190,6 +190,36 @@ if "scan_result" in st.session_state:
 
 # === Preview & Download ===
 st.subheader("Preview Data")
+
+with st.expander("🔎 Search / Filter", expanded=True):
+    q = st.text_input("Cari (semua kolom)", placeholder="ketik mis. 292135 / 'Gate 1' / email / nama")
+
+    c1, c2, c3, c4, c5, c6 = st.columns(6)
+    f_ticket = c1.text_input("Ticket ID")
+    f_user   = c2.text_input("Username")
+    f_email  = c3.text_input("Email")
+    f_phone  = c4.text_input("Phone")
+    f_seat   = c5.text_input("Seat")
+    f_status = c6.selectbox("Status", ["(any)", "Scanned", "Not Yet"], index=0)
+
+# --- apply filters ---
+view = df.copy()
+
+# quick search (semua kolom)
+if q:
+    mask = False
+    for col in view.columns:
+        mask = mask | view[col].astype(str).str.contains(q, case=False, na=False)
+    view = view[mask]
+
+# column filters (opsional)
+if f_ticket:
+    view = view[view["ticket_id"].astype(str).str.contains(f_ticket, case=False, na=False)]
+if f_user and "username" in view.columns:
+    view = view[view["username"].astype(str).str.contains(f_user, case=False, na=False)]
+if f_email and "email" in view.columns:
+    view = view[view["email"].astype(str).str.contains(f_ema_]()
+
 st.dataframe(df, use_container_width=True)
 
 st.subheader("Download Hasil")
