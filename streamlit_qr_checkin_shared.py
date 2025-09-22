@@ -232,13 +232,6 @@ elif f_status == "Not Yet":
 st.dataframe(view, use_container_width=True)
 
 # Optional: download yang sudah terfilter
-buf = io.BytesIO()
-view.to_excel(buf, index=False)
-st.download_button("⬇️ Download (Filtered)", data=buf.getvalue(), file_name="AttendanceReport_SHARED_filtered.xlsx")
-
-
-st.dataframe(df, use_container_width=True)
-
 st.subheader("Download Hasil")
 buf = io.BytesIO()
 df.to_excel(buf, index=False)
