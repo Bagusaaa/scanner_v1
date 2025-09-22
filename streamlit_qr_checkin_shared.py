@@ -72,7 +72,7 @@ def save_shared_df(df):
 def _now_str():
     return datetime.now(TZ).strftime(TS_FMT)
 
-def mark_scanned(ticket_value, who=""):
+def mark_scanned(ticket_value, who="Gate 1"):
     t = str(ticket_value or "").strip()
     if not t:
         return ("warn", "Ticket ID kosong.")
