@@ -1,0 +1,8 @@
+
+pandas
+streamlit
+filelock
+streamlit-autorefresh
+streamlit-webrtc
+opencv-python-headless
+openpyxl
