@@ -187,3 +187,12 @@ if "scan_result" in st.session_state:
     time.sleep(2)
     st.session_state.pop("scan_result", None)
     # (tidak ada rerun di sini)
+
+# === Preview & Download ===
+st.subheader("Preview Data")
+st.dataframe(df, use_container_width=True)
+
+st.subheader("Download Hasil")
+buf = io.BytesIO()
+df.to_excel(buf, index=False)
+st.download_button("⬇️ Download", data=buf.getvalue(), file_name="AttendanceReport_SHARED.xlsx")
