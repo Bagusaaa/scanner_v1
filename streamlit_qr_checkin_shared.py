@@ -132,7 +132,7 @@ with st.sidebar:
     st.divider()
     st.caption("🔄 Auto-refresh UI (opsional)")
     if st_autorefresh:
-        st_autorefresh(interval=6000, key="refresh")
+        st_autorefresh(interval=3000, key="refresh")
 
 df = load_shared_df()
 if df is None:
@@ -152,9 +152,46 @@ with st.form("scan_form", clear_on_submit=True):
     who = st.text_input("Scanned by", value="Gate 1")
     sub = st.form_submit_button("Scan")
 if sub:
+    if sub:
     s, m = mark_scanned(t_id, who)
     _beep()
-    getattr(st, "success" if s == "ok" else "warning" if s == "warn" else "error")(m)
+
+    # simpan status supaya bisa ditampilkan di layar
+    st.session_state["scan_result"] = (s, m)
+    st.experimental_rerun()
+
+# tampilkan popup jika ada hasil scan
+if "scan_result" in st.session_state:
+    s, m = st.session_state["scan_result"]
+    color = "#4CAF50" if s == "ok" else "#FFC107" if s == "warn" else "#F44336"
+
+    st.markdown(
+        f"""
+        <div style="
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: {color};
+            color: white;
+            padding: 40px 60px;
+            border-radius: 20px;
+            font-size: 2rem;
+            font-weight: bold;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            z-index: 9999;">
+            {m}
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+    # auto close setelah 2 detik lalu refresh
+    import time
+    time.sleep(2)
+    st.session_state.pop("scan_result")
+    st.experimental_rerun()
 
 # st.divider()
 # st.subheader("📷 Mode Kamera (Webcam, OpenCV-only)")
