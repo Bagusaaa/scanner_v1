@@ -125,6 +125,34 @@ with st.sidebar:
             save_shared_df(cur)
             st.success("Status scan direset")
 
+# --- Password Gate ---
+    admin_pw = st.text_input("Admin Password", type="password", placeholder="Masukkan password")
+    PASSWORD = "12345"  # Ganti dengan password kamu sendiri
+
+    upl = st.file_uploader("Upload Excel", type=["xlsx"])
+    if upl and st.button("Seed/Replace shared.xlsx"):
+        if admin_pw == PASSWORD:
+            try:
+                df_up = pd.read_excel(upl)
+                df_up = _ensure_cols(df_up)
+                save_shared_df(df_up)
+                st.success(f"File tersimpan ({len(df_up)} rows)")
+            except Exception as e:
+                st.error(f"Gagal: {e}")
+        else:
+            st.error("❌ Password salah! Tidak bisa upload file.")
+
+    if st.button("Reset scanned_at/by"):
+        if admin_pw == PASSWORD:
+            cur = load_shared_df()
+            if cur is not None:
+                cur["scanned_at"] = pd.NaT
+                cur["scanned_by"] = pd.NA
+                save_shared_df(cur)
+                st.success("Status scan direset")
+        else:
+            st.error("❌ Password salah! Tidak bisa reset status.")
+
     st.divider()
     st.caption("🔄 Auto-refresh UI (opsional)")
     if st_autorefresh:
