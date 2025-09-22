@@ -192,7 +192,7 @@ if "scan_result" in st.session_state:
 st.subheader("Preview Data")
 
 with st.expander("🔎 Search / Filter", expanded=True):
-    q = st.text_input("Cari (semua kolom)", placeholder="ketik mis. 292135 / 'Gate 1' / email / nama")
+    q = st.text_input("Cari cepat (semua kolom)", placeholder="ketik mis. 292135 / 'Gate 1' / email / nama")
 
     c1, c2, c3, c4, c5, c6 = st.columns(6)
     f_ticket = c1.text_input("Ticket ID")
@@ -218,7 +218,24 @@ if f_ticket:
 if f_user and "username" in view.columns:
     view = view[view["username"].astype(str).str.contains(f_user, case=False, na=False)]
 if f_email and "email" in view.columns:
-    view = view[view["email"].astype(str).str.contains(f_ema_]()
+    view = view[view["email"].astype(str).str.contains(f_email, case=False, na=False)]
+if f_phone and "phone" in view.columns:
+    view = view[view["phone"].astype(str).str.contains(f_phone, case=False, na=False)]
+if f_seat and "seat" in view.columns:
+    view = view[view["seat"].astype(str).str.contains(f_seat, case=False, na=False)]
+
+if f_status == "Scanned":
+    view = view[view["scanned_at"].notna()]
+elif f_status == "Not Yet":
+    view = view[view["scanned_at"].isna()]
+
+st.dataframe(view, use_container_width=True)
+
+# Optional: download yang sudah terfilter
+buf = io.BytesIO()
+view.to_excel(buf, index=False)
+st.download_button("⬇️ Download (Filtered)", data=buf.getvalue(), file_name="AttendanceReport_SHARED_filtered.xlsx")
+
 
 st.dataframe(df, use_container_width=True)
 
