@@ -7,7 +7,6 @@ from zoneinfo import ZoneInfo
 import pandas as pd
 import streamlit as st
 import streamlit.components.v1 as components
-import openpyxl
 
 try:
     from filelock import FileLock
@@ -107,8 +106,8 @@ def mark_scanned(ticket_value, who="Gate 1"):
     else:
         return ("error", f"Tiket {t} SUDAH discan pada {', '.join(infos)}")
 
-st.title("🎟️ QR Check-in (Shared Excel, CV2-only)")
-st.caption("Tanpa ZBar/pyzbar. Webcam decode pakai OpenCV QRCodeDetector.")
+st.title("🎟️ QR Check-in (Alur Production Indonesia)")
+#st.caption("Tanpa ZBar/pyzbar. Webcam decode pakai OpenCV QRCodeDetector.")
 
 with st.sidebar:
     st.header("Admin Upload")
@@ -157,51 +156,51 @@ if sub:
     _beep()
     getattr(st, "success" if s == "ok" else "warning" if s == "warn" else "error")(m)
 
-st.divider()
-st.subheader("📷 Mode Kamera (Webcam, OpenCV-only)")
-if not _webrtc_ok:
-    st.info("streamlit-webrtc belum terpasang. Install di server untuk webcam mode.")
-if not _cv2_ok:
-    st.info("OpenCV belum terpasang. Jalankan: pip install opencv-python-headless")
+# st.divider()
+# st.subheader("📷 Mode Kamera (Webcam, OpenCV-only)")
+# if not _webrtc_ok:
+#     st.info("streamlit-webrtc belum terpasang. Install di server untuk webcam mode.")
+# if not _cv2_ok:
+#     st.info("OpenCV belum terpasang. Jalankan: pip install opencv-python-headless")
 
-cam_enable = st.toggle("Aktifkan kamera", value=False, disabled=not (_webrtc_ok and _cv2_ok))
-if cam_enable and _webrtc_ok and _cv2_ok:
-    rtc_config = RTCConfiguration({"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]})
-    last_ticket_placeholder = st.empty()
-    if "last_camera_decode" not in st.session_state:
-        st.session_state["last_camera_decode"] = None
+# cam_enable = st.toggle("Aktifkan kamera", value=False, disabled=not (_webrtc_ok and _cv2_ok))
+# if cam_enable and _webrtc_ok and _cv2_ok:
+#     rtc_config = RTCConfiguration({"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]})
+#     last_ticket_placeholder = st.empty()
+#     if "last_camera_decode" not in st.session_state:
+#         st.session_state["last_camera_decode"] = None
 
-    detector = cv2.QRCodeDetector()
+#     detector = cv2.QRCodeDetector()
 
-    def on_frame(frame):
-        img = frame.to_ndarray(format="bgr24")
-        data, points, _ = detector.detectAndDecode(img)
-        if data:
-            tid = data.strip()
-            if st.session_state["last_camera_decode"] != tid:
-                st.session_state["last_camera_decode"] = tid
-                s, m = mark_scanned(tid, who="Webcam")
-                _beep()
-                if s == "ok":
-                    last_ticket_placeholder.success(f"[Webcam] {m}")
-                elif s == "warn":
-                    last_ticket_placeholder.warning(f"[Webcam] {m}")
-                else:
-                    last_ticket_placeholder.error(f"[Webcam] {m}")
-        return frame
+#     def on_frame(frame):
+#         img = frame.to_ndarray(format="bgr24")
+#         data, points, _ = detector.detectAndDecode(img)
+#         if data:
+#             tid = data.strip()
+#             if st.session_state["last_camera_decode"] != tid:
+#                 st.session_state["last_camera_decode"] = tid
+#                 s, m = mark_scanned(tid, who="Webcam")
+#                 _beep()
+#                 if s == "ok":
+#                     last_ticket_placeholder.success(f"[Webcam] {m}")
+#                 elif s == "warn":
+#                     last_ticket_placeholder.warning(f"[Webcam] {m}")
+#                 else:
+#                     last_ticket_placeholder.error(f"[Webcam] {m}")
+#         return frame
 
-    webrtc_streamer(
-        key="qr-webcam-shared-cv2",
-        mode=WebRtcMode.SENDRECV,
-        rtc_configuration=rtc_config,
-        media_stream_constraints={"video": True, "audio": False},
-        video_frame_callback=on_frame,
-    )
+#     webrtc_streamer(
+#         key="qr-webcam-shared-cv2",
+#         mode=WebRtcMode.SENDRECV,
+#         rtc_configuration=rtc_config,
+#         media_stream_constraints={"video": True, "audio": False},
+#         video_frame_callback=on_frame,
+#     )
 
-st.subheader("Preview Data (Shared)")
+st.subheader("Preview Data")
 st.dataframe(load_shared_df(), use_container_width=True)
 
-st.subheader("Download Hasil (Shared)")
+st.subheader("Download Hasil")
 buf = io.BytesIO()
 load_shared_df().to_excel(buf, index=False)
 st.download_button("⬇️ Download", data=buf.getvalue(), file_name="AttendanceReport_SHARED.xlsx")
