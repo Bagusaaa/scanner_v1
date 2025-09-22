@@ -1,6 +1,4 @@
-
 # 🎟️ QR Check-in (Shared Excel) — OpenCV-only (no ZBar)
-# Semua klien sinkron pakai data/shared.xlsx. Webcam decode menggunakan cv2.QRCodeDetector().
 import io, os
 from datetime import datetime
 from zoneinfo import ZoneInfo
@@ -107,7 +105,6 @@ def mark_scanned(ticket_value, who="Gate 1"):
         return ("error", f"Tiket {t} SUDAH discan pada {', '.join(infos)}")
 
 st.title("🎟️ QR Check-in (Alur Production Indonesia)")
-#st.caption("Tanpa ZBar/pyzbar. Webcam decode pakai OpenCV QRCodeDetector.")
 
 with st.sidebar:
     st.header("Admin Upload")
@@ -146,20 +143,20 @@ c1.metric("Total", total)
 c2.metric("Scanned", scanned)
 c3.metric("Not Yet", total - scanned)
 
+# === Form Scan ===
 st.subheader("Scan / Input Ticket ID (Keyboard/Scanner)")
 with st.form("scan_form", clear_on_submit=True):
     t_id = st.text_input("Ticket ID")
     who = st.text_input("Scanned by", value="Gate 1")
     sub = st.form_submit_button("Scan")
+
 if sub:
-s, m = mark_scanned(t_id, who)
-_beep()
+    s, m = mark_scanned(t_id, who)
+    _beep()
+    st.session_state["scan_result"] = (s, m)
+    st.experimental_rerun()
 
-# simpan hasil scan agar bisa ditampilkan
-st.session_state["scan_result"] = (s, m)
-st.experimental_rerun()
-
-# tampilkan popup jika ada hasil
+# === Popup Notification ===
 if "scan_result" in st.session_state:
     s, m = st.session_state["scan_result"]
     color = "#4CAF50" if s == "ok" else "#FFC107" if s == "warn" else "#F44336"
@@ -186,53 +183,12 @@ if "scan_result" in st.session_state:
         unsafe_allow_html=True
     )
 
-import time
-time.sleep(2)
-st.session_state.pop("scan_result")
-st.experimental_rerun()
+    import time
+    time.sleep(2)
+    st.session_state.pop("scan_result", None)
+    st.experimental_rerun()
 
-
-# st.divider()
-# st.subheader("📷 Mode Kamera (Webcam, OpenCV-only)")
-# if not _webrtc_ok:
-#     st.info("streamlit-webrtc belum terpasang. Install di server untuk webcam mode.")
-# if not _cv2_ok:
-#     st.info("OpenCV belum terpasang. Jalankan: pip install opencv-python-headless")
-
-# cam_enable = st.toggle("Aktifkan kamera", value=False, disabled=not (_webrtc_ok and _cv2_ok))
-# if cam_enable and _webrtc_ok and _cv2_ok:
-#     rtc_config = RTCConfiguration({"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]})
-#     last_ticket_placeholder = st.empty()
-#     if "last_camera_decode" not in st.session_state:
-#         st.session_state["last_camera_decode"] = None
-
-#     detector = cv2.QRCodeDetector()
-
-#     def on_frame(frame):
-#         img = frame.to_ndarray(format="bgr24")
-#         data, points, _ = detector.detectAndDecode(img)
-#         if data:
-#             tid = data.strip()
-#             if st.session_state["last_camera_decode"] != tid:
-#                 st.session_state["last_camera_decode"] = tid
-#                 s, m = mark_scanned(tid, who="Webcam")
-#                 _beep()
-#                 if s == "ok":
-#                     last_ticket_placeholder.success(f"[Webcam] {m}")
-#                 elif s == "warn":
-#                     last_ticket_placeholder.warning(f"[Webcam] {m}")
-#                 else:
-#                     last_ticket_placeholder.error(f"[Webcam] {m}")
-#         return frame
-
-#     webrtc_streamer(
-#         key="qr-webcam-shared-cv2",
-#         mode=WebRtcMode.SENDRECV,
-#         rtc_configuration=rtc_config,
-#         media_stream_constraints={"video": True, "audio": False},
-#         video_frame_callback=on_frame,
-#     )
-
+# === Preview & Download ===
 st.subheader("Preview Data")
 st.dataframe(load_shared_df(), use_container_width=True)
 
