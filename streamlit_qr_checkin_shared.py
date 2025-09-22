@@ -107,51 +107,48 @@ st.title("🎟️ QR Check-in (Alur Production Indonesia)")
 
 with st.sidebar:
     st.header("Admin Upload")
-    upl = st.file_uploader("Upload Excel", type=["xlsx"])
-    if upl and st.button("Seed/Replace shared.xlsx"):
-        try:
-            df_up = pd.read_excel(upl)
-            df_up = _ensure_cols(df_up)
-            save_shared_df(df_up)
-            st.success(f"File tersimpan ({len(df_up)} rows)")
-        except Exception as e:
-            st.error(f"Gagal: {e}")
 
-    if st.button("Reset scanned_at/by"):
-        cur = load_shared_df()
-        if cur is not None:
-            cur["scanned_at"] = pd.NaT
-            cur["scanned_by"] = pd.NA
-            save_shared_df(cur)
-            st.success("Status scan direset")
+    # --- Password Gate ---
+    PASSWORD = st.secrets.get("ADMIN_PASSWORD", os.getenv("ADMIN_PASSWORD", "12345"))
+    admin_pw = st.text_input("Admin Password", type="password", placeholder="••••••", key="admin_pw")
 
-# --- Password Gate ---
-    admin_pw = st.text_input("Admin Password", type="password", placeholder="Masukkan password")
-    PASSWORD = "12345"  # Ganti dengan password kamu sendiri
-
-    upl = st.file_uploader("Upload Excel", type=["xlsx"])
-    if upl and st.button("Seed/Replace shared.xlsx"):
+    # Satu-satunya uploader (beri key unik)
+    upl = st.file_uploader("Upload Excel", type=["xlsx"], key="upl_shared")
+    if upl and st.button("Seed/Replace shared.xlsx", key="btn_seed"):
         if admin_pw == PASSWORD:
             try:
                 df_up = pd.read_excel(upl)
                 df_up = _ensure_cols(df_up)
                 save_shared_df(df_up)
-                st.success(f"File tersimpan ({len(df_up)} rows)")
+                # popup hijau di tengah
+                st.session_state["scan_result"] = ("ok", f"✅ File tersimpan ({len(df_up)} rows)")
+                st.rerun()
             except Exception as e:
-                st.error(f"Gagal: {e}")
+                _beep()
+                st.session_state["scan_result"] = ("error", f"❌ Gagal upload: {e}")
+                st.rerun()
         else:
-            st.error("❌ Password salah! Tidak bisa upload file.")
+            _beep()
+            st.session_state["scan_result"] = ("error", "❌ Password salah — upload dibatalkan.")
+            st.rerun()
 
-    if st.button("Reset scanned_at/by"):
+    # Satu tombol reset (key unik)
+    if st.button("Reset scanned_at/by", key="btn_reset"):
         if admin_pw == PASSWORD:
             cur = load_shared_df()
             if cur is not None:
                 cur["scanned_at"] = pd.NaT
                 cur["scanned_by"] = pd.NA
                 save_shared_df(cur)
-                st.success("Status scan direset")
+                st.session_state["scan_result"] = ("ok", "✅ Status scan berhasil direset.")
+                st.rerun()
+            else:
+                st.session_state["scan_result"] = ("warn", "⚠️ Belum ada data/shared.xlsx.")
+                st.rerun()
         else:
-            st.error("❌ Password salah! Tidak bisa reset status.")
+            _beep()
+            st.session_state["scan_result"] = ("error", "❌ Password salah — reset dibatalkan.")
+            st.rerun()
 
     st.divider()
     st.caption("🔄 Auto-refresh UI (opsional)")
