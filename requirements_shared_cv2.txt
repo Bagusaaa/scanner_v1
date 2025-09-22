@@ -6,3 +6,6 @@ streamlit-autorefresh
 streamlit-webrtc
 opencv-python-headless
 openpyxl
+streamlit
+opencv-python
+numpy
