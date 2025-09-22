@@ -7,6 +7,7 @@ from zoneinfo import ZoneInfo
 import pandas as pd
 import streamlit as st
 import streamlit.components.v1 as components
+import openpyxl
 
 try:
     from filelock import FileLock
