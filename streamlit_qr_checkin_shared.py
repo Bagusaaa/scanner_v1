@@ -132,7 +132,7 @@ with st.sidebar:
     st.divider()
     st.caption("🔄 Auto-refresh UI (opsional)")
     if st_autorefresh:
-        st_autorefresh(interval=3000, key="refresh")
+        st_autorefresh(interval=6000, key="refresh")
 
 df = load_shared_df()
 if df is None:
