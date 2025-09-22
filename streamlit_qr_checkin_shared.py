@@ -149,12 +149,14 @@ with st.form("scan_form", clear_on_submit=True):
     who = st.text_input("Scanned by", value="Gate 1")
     sub = st.form_submit_button("Scan")
 
+# --- Hasil Scan ---
 if sub:
     s, m = mark_scanned(t_id, who)
     _beep()
     st.session_state["scan_result"] = (s, m)
-    st.experimental_rerun()
+    st.rerun()   # <- ganti ini, dan hanya di sini kita rerun
 
+# --- Popup Notifikasi ---
 if "scan_result" in st.session_state:
     s, m = st.session_state["scan_result"]
     color = "#4CAF50" if s == "ok" else "#FFC107" if s == "warn" else "#F44336"
@@ -181,8 +183,7 @@ if "scan_result" in st.session_state:
         unsafe_allow_html=True
     )
 
-    # Auto-close popup tanpa rerun
     import time
     time.sleep(2)
     st.session_state.pop("scan_result", None)
-    # HAPUS st.experimental_rerun() di sini
+    # (tidak ada rerun di sini)
