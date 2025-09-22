@@ -1,5 +1,4 @@
-# 🎟️ QR Check-in (Shared Excel) — OpenCV-only (no ZBar)
-import io, os
+import io, os, time
 from datetime import datetime
 from zoneinfo import ZoneInfo
 import pandas as pd
@@ -183,16 +182,15 @@ if "scan_result" in st.session_state:
         unsafe_allow_html=True
     )
 
-    import time
     time.sleep(2)
     st.session_state.pop("scan_result", None)
     st.experimental_rerun()
 
 # === Preview & Download ===
 st.subheader("Preview Data")
-st.dataframe(load_shared_df(), use_container_width=True)
+st.dataframe(df, use_container_width=True)
 
 st.subheader("Download Hasil")
 buf = io.BytesIO()
-load_shared_df().to_excel(buf, index=False)
+df.to_excel(buf, index=False)
 st.download_button("⬇️ Download", data=buf.getvalue(), file_name="AttendanceReport_SHARED.xlsx")
