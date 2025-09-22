@@ -165,9 +165,9 @@ if "scan_result" in st.session_state:
         f"""
         <div style="
             position: fixed;
-            top: 50%;
+            top: 64px;
             left: 50%;
-            transform: translate(-50%, -50%);
+            transform: translate(-50%, 0%);
             background-color: {color};
             color: white;
             padding: 40px 60px;
