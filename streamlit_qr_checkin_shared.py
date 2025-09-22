@@ -152,15 +152,14 @@ with st.form("scan_form", clear_on_submit=True):
     who = st.text_input("Scanned by", value="Gate 1")
     sub = st.form_submit_button("Scan")
 if sub:
-    if sub:
-    s, m = mark_scanned(t_id, who)
-    _beep()
+s, m = mark_scanned(t_id, who)
+_beep()
 
-    # simpan status supaya bisa ditampilkan di layar
-    st.session_state["scan_result"] = (s, m)
-    st.experimental_rerun()
+# simpan hasil scan agar bisa ditampilkan
+st.session_state["scan_result"] = (s, m)
+st.experimental_rerun()
 
-# tampilkan popup jika ada hasil scan
+# tampilkan popup jika ada hasil
 if "scan_result" in st.session_state:
     s, m = st.session_state["scan_result"]
     color = "#4CAF50" if s == "ok" else "#FFC107" if s == "warn" else "#F44336"
@@ -187,11 +186,11 @@ if "scan_result" in st.session_state:
         unsafe_allow_html=True
     )
 
-    # auto close setelah 2 detik lalu refresh
-    import time
-    time.sleep(2)
-    st.session_state.pop("scan_result")
-    st.experimental_rerun()
+import time
+time.sleep(2)
+st.session_state.pop("scan_result")
+st.experimental_rerun()
+
 
 # st.divider()
 # st.subheader("📷 Mode Kamera (Webcam, OpenCV-only)")
