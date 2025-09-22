@@ -155,7 +155,6 @@ if sub:
     st.session_state["scan_result"] = (s, m)
     st.experimental_rerun()
 
-# === Popup Notification ===
 if "scan_result" in st.session_state:
     s, m = st.session_state["scan_result"]
     color = "#4CAF50" if s == "ok" else "#FFC107" if s == "warn" else "#F44336"
@@ -182,15 +181,8 @@ if "scan_result" in st.session_state:
         unsafe_allow_html=True
     )
 
+    # Auto-close popup tanpa rerun
+    import time
     time.sleep(2)
     st.session_state.pop("scan_result", None)
-    st.experimental_rerun()
-
-# === Preview & Download ===
-st.subheader("Preview Data")
-st.dataframe(df, use_container_width=True)
-
-st.subheader("Download Hasil")
-buf = io.BytesIO()
-df.to_excel(buf, index=False)
-st.download_button("⬇️ Download", data=buf.getvalue(), file_name="AttendanceReport_SHARED.xlsx")
+    # HAPUS st.experimental_rerun() di sini
