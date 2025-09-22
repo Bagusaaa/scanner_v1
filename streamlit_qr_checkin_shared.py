@@ -159,7 +159,7 @@ if sub:
 # --- Popup Notifikasi ---
 if "scan_result" in st.session_state:
     s, m = st.session_state["scan_result"]
-    color = "#AAFD92" if s == "ok" else "#FFE084" if s == "warn" else "#F97167"
+    color = "#64F43C" if s == "ok" else "#FFD146" if s == "warn" else "#FE1C0B"
 
     st.markdown(
         f"""
